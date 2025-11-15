@@ -18,6 +18,53 @@ import type {
 } from '@ai-learning/types';
 
 // ============================================================================
+// Adaptive Difficulty Engine (2U1D)
+// ============================================================================
+
+/**
+ * Реализация алгоритма 2U1D (2 Up, 1 Down) для динамической подстройки сложности.
+ * Используется для определения следующего уровня сложности задания для пользователя.
+ */
+export class AdaptiveDifficultyEngine {
+  private consecutiveCorrect: number;
+  private currentDifficulty: number; // Шкала 1-10
+
+  constructor(initialDifficulty: number = 5, initialConsecutiveCorrect: number = 0) {
+    this.currentDifficulty = Math.max(1, Math.min(10, initialDifficulty));
+    this.consecutiveCorrect = initialConsecutiveCorrect;
+  }
+
+  /**
+   * Обновляет сложность на основе результата выполнения задания.
+   * @param isCorrect Было ли задание выполнено правильно.
+   * @returns Новый уровень сложности (1-10).
+   */
+  adjustDifficulty(isCorrect: boolean): number {
+    if (isCorrect) {
+      this.consecutiveCorrect++;
+      // 2-up: повышение после 2 правильных
+      if (this.consecutiveCorrect >= 2) {
+        this.currentDifficulty = Math.min(this.currentDifficulty + 1, 10);
+        this.consecutiveCorrect = 0;
+      }
+    } else {
+      this.consecutiveCorrect = 0;
+      // 1-down: понижение после 1 неправильного
+      this.currentDifficulty = Math.max(this.currentDifficulty - 1, 1);
+    }
+    return this.currentDifficulty;
+  }
+
+  getCurrentDifficulty(): number {
+    return this.currentDifficulty;
+  }
+
+  getConsecutiveCorrect(): number {
+    return this.consecutiveCorrect;
+  }
+}
+
+// ============================================================================
 // Recommendation Engine Core
 // ============================================================================
 
@@ -201,25 +248,43 @@ export class RecommendationEngine {
     module: LearningModule,
     reasons: RecommendationReason[]
   ): number {
-    const userLevel = user.profile.level;
-    const moduleDifficulty = module.difficulty;
-    const preferredDifficulty = user.profile.preferences.preferredDifficulty;
+    // В реальной системе здесь должна быть логика, которая использует
+    // AdaptiveDifficultyEngine для определения идеальной сложности для пользователя
+    // на основе его последних результатов.
+    
+    // Для MVP мы используем упрощенную логику, основанную на уровне пользователя
+    // и предполагаем, что сложность модуля (EASY, MEDIUM, HARD, EXPERT)
+    // соответствует шкале 1-10.
+    
+    const userLevelMap: Record<DifficultyLevel, number> = {
+      [DifficultyLevel.EASY]: 3,
+      [DifficultyLevel.MEDIUM]: 5,
+      [DifficultyLevel.HARD]: 7,
+      [DifficultyLevel.EXPERT]: 9,
+    };
 
-    // Идеальное соответствие
-    if (this.isDifficultyMatch(userLevel, moduleDifficulty)) {
-      if (moduleDifficulty === preferredDifficulty) {
-        return 1.0;
-      }
-      return 0.8;
+    const moduleDifficultyValue = userLevelMap[module.difficulty] || 5;
+    const userCurrentLevelValue = userLevelMap[user.profile.preferences.preferredDifficulty] || 5;
+
+    // Идеальное соответствие: разница в сложности <= 1
+    const difficultyDifference = Math.abs(moduleDifficultyValue - userCurrentLevelValue);
+
+    if (difficultyDifference <= 1) {
+      reasons.push({
+        type: ReasonType.DIFFICULTY_MATCH,
+        description: 'Сложность соответствует вашему текущему уровню',
+        weight: 0.8
+      });
+      return 1.0;
     }
 
-    // Модуль слишком простой - низкий score
-    if (this.isTooEasy(userLevel, moduleDifficulty)) {
+    // Модуль слишком простой (разница > 2)
+    if (moduleDifficultyValue < userCurrentLevelValue - 2) {
       return 0.3;
     }
 
-    // Модуль слишком сложный - очень низкий score
-    if (this.isTooDifficult(userLevel, moduleDifficulty)) {
+    // Модуль слишком сложный (разница > 2)
+    if (moduleDifficultyValue > userCurrentLevelValue + 2) {
       reasons.push({
         type: ReasonType.SKILL_GAP,
         description: 'Может быть слишком сложным на текущем уровне',
@@ -228,7 +293,7 @@ export class RecommendationEngine {
       return 0.1;
     }
 
-    return 0.5;
+    return 0.7; // Умеренное соответствие
   }
 
   /**

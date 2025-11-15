@@ -91,20 +91,21 @@
 ├── Recommendation Service (AI-powered)
 ├── Progress Tracking Service
 ├── Analytics Service
-└── Notification Service
+├── Notification Service
+├── **Payment Service (Telegram Stars)**
+└── **TON Service (NFT Minting)**
 ```
-
 ### 7. Data Layer
 ```
 MongoDB/PostgreSQL:
-├── Users
-├── Learning Modules
-├── User Progress
+├── Users (**+ tonAddress**)
+├── Learning Modules (**+ starsPrice, nftContractAddress**)
+├── User Progress (**+ nftTokenId**)
 ├── Achievements
 ├── Analytics Events
-└── Recommendations History
-
-Vector Database (Pinecone/Qdrant):
+├── Recommendations History
+└── **Transactions (Payment History)**
+```ector Database (Pinecone/Qdrant):
 ├── Content Embeddings
 ├── User Skill Embeddings
 └── Semantic Search Index
@@ -151,7 +152,7 @@ Vector Database (Pinecone/Qdrant):
 ```typescript
 RecommendationScore =
   α × ContentRelevance +        // Релевантность контента навыкам
-  β × DifficultyMatch +         // Соответствие уровню сложности
+  β × DifficultyMatch +         // Соответствие уровню сложности (**Усилено 2U1D**)
   γ × LearningStyleFit +        // Соответствие стилю обучения
   δ × ProgressVelocity +        // Скорость усвоения материала
   ε × PeerSuccessRate +         // Успешность у похожих пользователей

@@ -22,6 +22,7 @@ export interface User {
   createdAt: Date;
   updatedAt: Date;
   lastActiveAt: Date;
+  tonAddress?: string; // Адрес TON кошелька
 }
 
 export interface UserProfile {
@@ -96,6 +97,9 @@ export interface LearningModule {
   completionCount: number;
   averageRating: number;
   averageCompletionTime: number;
+
+  starsPrice?: number; // Цена в Telegram Stars
+  nftContractAddress?: string; // Адрес смарт-контракта NFT
 
   createdAt: Date;
   updatedAt: Date;
@@ -297,6 +301,8 @@ export interface ModuleProgress {
   sectionsCompleted: string[];
   exercisesCompleted: ExerciseProgress[];
   quizResults?: QuizResult;
+
+  nftTokenId?: string; // ID выданного NFT-сертификата
 
   notes?: string;
   bookmarked: boolean;

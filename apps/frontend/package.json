@@ -10,18 +10,19 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.20.0",
-    "@telegram-apps/sdk-react": "^1.0.0",
-    "zustand": "^4.4.7",
+    "@grammyjs/types": "^3.22.2",
     "@tanstack/react-query": "^5.12.0",
+    "@telegram-apps/sdk-react": "^1.0.0",
     "axios": "^1.6.2",
     "framer-motion": "^10.16.5",
-    "recharts": "^2.10.3",
+    "lucide-react": "^0.294.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-markdown": "^9.0.1",
+    "react-router-dom": "^6.20.0",
     "react-syntax-highlighter": "^15.5.0",
-    "lucide-react": "^0.294.0"
+    "recharts": "^2.10.3",
+    "zustand": "^4.4.7"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",

@@ -1,0 +1,165 @@
+{
+  "id": "foundation-01-what-are-ai-agents",
+  "title": "Что такое AI агенты: Основы и концепции",
+  "description": "Фундаментальное введение в мир искусственных интеллектуальных агентов. Понимание базовых концепций, истории развития и современных возможностей.",
+  "category": "foundation",
+  "difficulty": "easy",
+  "estimatedMinutes": 30,
+  "prerequisites": [],
+  "skills": [
+    "ai-agents-basics",
+    "ai-terminology",
+    "agent-types"
+  ],
+  "tags": [
+    "введение",
+    "основы",
+    "концепции",
+    "история AI"
+  ],
+  "content": {
+    "type": "tutorial",
+    "sections": [
+      {
+        "id": "section-1",
+        "title": "Введение в AI агентов",
+        "order": 1,
+        "blocks": [
+          {
+            "type": "text",
+            "content": "# Что такое AI агент?\n\n**AI агент** — это автономная программная система, которая:\n- **Воспринимает** окружающую среду через сенсоры (данные, API, пользовательский ввод)\n- **Принимает решения** на основе полученной информации\n- **Выполняет действия** для достижения определенных целей\n- **Обучается** на основе опыта\n\nВ отличие от традиционных программ, AI агенты обладают:\n- **Автономностью** - работают без постоянного контроля\n- **Реактивностью** - реагируют на изменения среды\n- **Проактивностью** - могут инициировать действия сами\n- **Социальностью** - могут взаимодействовать с другими агентами"
+          },
+          {
+            "type": "image",
+            "url": "/assets/diagrams/ai-agent-overview.svg",
+            "alt": "Схема работы AI агента",
+            "caption": "Базовая архитектура AI агента: восприятие → рассуждение → действие"
+          },
+          {
+            "type": "text",
+            "content": "## История развития AI агентов\n\n### 1950-1970: Ранние идеи\n- Тест Тьюринга (1950)\n- Первые чат-боты (ELIZA, 1966)\n- Экспертные системы\n\n### 1980-2000: Развитие теории\n- Агентно-ориентированное программирование\n- Multi-agent системы\n- Reinforcement Learning\n\n### 2000-2020: Практическое применение\n- Виртуальные ассистенты (Siri, Alexa)\n- Автономные транспортные средства\n- Игровые AI\n\n### 2020-настоящее: Эра LLM-агентов\n- GPT-based агенты\n- AutoGPT, BabyAGI\n- Multi-modal агенты\n- Агентские фреймворки (LangChain, AutoGen)"
+          }
+        ]
+      },
+      {
+        "id": "section-2",
+        "title": "Типы AI агентов",
+        "order": 2,
+        "blocks": [
+          {
+            "type": "text",
+            "content": "# Классификация AI агентов\n\n## По степени автономности\n\n### 1. Простые рефлексивные агенты\n- Реагируют на текущую ситуацию\n- Не имеют памяти о прошлом\n- Пример: термостат, базовый чат-бот\n\n### 2. Модель-основанные рефлексивные агенты\n- Поддерживают внутреннюю модель мира\n- Отслеживают состояние\n- Пример: пылесос-робот с картой помещения\n\n### 3. Целевые агенты\n- Имеют четкие цели\n- Планируют действия для их достижения\n- Пример: системы планирования маршрутов\n\n### 4. Утилитарные агенты\n- Максимизируют функцию полезности\n- Оценивают разные состояния\n- Пример: игровые AI, оптимизационные системы\n\n### 5. Обучающиеся агенты\n- Улучшают производительность со временем\n- Адаптируются к новым условиям\n- Пример: рекомендательные системы, RL-агенты"
+          },
+          {
+            "type": "code",
+            "language": "python",
+            "code": "# Простой пример рефлексивного агента\nclass SimpleReflexAgent:\n    def __init__(self):\n        self.rules = {\n            'hot': 'turn_on_ac',\n            'cold': 'turn_on_heater',\n            'comfortable': 'do_nothing'\n        }\n    \n    def perceive(self, environment):\n        \"\"\"Воспринимает текущее состояние\"\"\"\n        return environment.get_temperature_status()\n    \n    def decide(self, percept):\n        \"\"\"Принимает решение на основе правил\"\"\"\n        return self.rules.get(percept, 'do_nothing')\n    \n    def act(self, action, environment):\n        \"\"\"Выполняет действие\"\"\"\n        environment.execute(action)\n\n# Использование\nagent = SimpleReflexAgent()\nwhile True:\n    percept = agent.perceive(environment)\n    action = agent.decide(percept)\n    agent.act(action, environment)",
+            "explanation": "Базовая структура рефлексивного агента с циклом восприятие-решение-действие",
+            "runnable": false
+          },
+          {
+            "type": "text",
+            "content": "## По области применения\n\n### Конверсационные агенты\n- Чат-боты и виртуальные ассистенты\n- Customer support агенты\n- Личные AI помощники\n\n### Автономные агенты задач\n- AutoGPT - выполнение сложных задач\n- Code generation агенты\n- Research агенты\n\n### Мультиагентные системы\n- Collaborative AI teams\n- Симуляции социальных систем\n- Распределенные решения задач\n\n### Специализированные агенты\n- Trading боты\n- Game AI\n- Робототехника\n- IoT агенты"
+          }
+        ]
+      },
+      {
+        "id": "section-3",
+        "title": "Современные LLM-based агенты",
+        "order": 3,
+        "blocks": [
+          {
+            "type": "text",
+            "content": "# Революция LLM-агентов\n\nС появлением больших языковых моделей (GPT-4, Claude, Gemini) возникло новое поколение AI агентов:\n\n## Ключевые возможности\n\n1. **Понимание естественного языка**\n   - Обработка сложных инструкций\n   - Контекстное понимание\n   - Многоязычность\n\n2. **Reasoning (Рассуждение)**\n   - Chain-of-Thought reasoning\n   - Планирование последовательности действий\n   - Решение многошаговых задач\n\n3. **Tool Use (Использование инструментов)**\n   - Function calling\n   - API интеграции\n   - Доступ к внешним данным\n\n4. **Memory (Память)**\n   - Краткосрочная (контекст)\n   - Долгосрочная (vector databases)\n   - Эпизодическая память\n\n5. **Self-reflection (Саморефлексия)**\n   - Анализ собственных действий\n   - Самокоррекция\n   - Улучшение стратегий"
+          },
+          {
+            "type": "code",
+            "language": "typescript",
+            "code": "// Современный LLM-based агент (концептуально)\nclass LLMAgent {\n  constructor(\n    private llm: LanguageModel,\n    private tools: Tool[],\n    private memory: VectorStore\n  ) {}\n\n  async run(task: string): Promise<string> {\n    // 1. Формируем план\n    const plan = await this.createPlan(task);\n    \n    // 2. Выполняем шаги плана\n    for (const step of plan.steps) {\n      // Рассуждаем о следующем действии\n      const thought = await this.think(step);\n      \n      // Выбираем и используем инструмент\n      const tool = this.selectTool(thought);\n      const result = await tool.execute(thought.params);\n      \n      // Сохраняем в память\n      await this.memory.store({\n        step,\n        thought,\n        action: tool.name,\n        result\n      });\n      \n      // Саморефлексия - нужна ли корректировка плана?\n      const shouldAdjust = await this.reflect(result);\n      if (shouldAdjust) {\n        plan = await this.adjustPlan(plan, result);\n      }\n    }\n    \n    // 3. Формируем финальный ответ\n    return this.synthesizeResponse();\n  }\n}",
+            "explanation": "Концептуальная архитектура современного LLM-агента с планированием, использованием инструментов и саморефлексией",
+            "runnable": false
+          },
+          {
+            "type": "text",
+            "content": "## Популярные паттерны LLM-агентов\n\n### ReAct (Reasoning + Acting)\n```\nThought: Мне нужно узнать погоду в Москве\nAction: search_weather(\"Moscow\")\nObservation: Температура 15°C, облачно\nThought: Теперь я знаю погоду, могу ответить\nAnswer: В Москве сейчас 15°C и облачно\n```\n\n### Plan-and-Execute\n```\nTask: Напиши отчет о рынке AI агентов\n\nPlan:\n1. Исследовать текущее состояние рынка\n2. Собрать статистику\n3. Проанализировать тренды\n4. Написать структурированный отчет\n\nExecute:\n[Step 1] → Research → Results\n[Step 2] → Analyze → Insights\n...\n```\n\n### Reflection\n```\nAttempt 1: Код не работает\nReflection: Я забыл обработать edge case\nAttempt 2: Добавил проверку, но есть баг\nReflection: Логическая ошибка в условии\nAttempt 3: Исправлено! Тесты проходят\n```"
+          }
+        ]
+      }
+    ],
+    "exercises": [
+      {
+        "id": "exercise-1",
+        "title": "Определи тип агента",
+        "description": "Изучи поведение агента и определи его тип",
+        "type": "code_completion",
+        "difficulty": "easy",
+        "instructions": "Даны описания различных AI систем. Определи тип каждого агента.",
+        "hints": [
+          "Обрати внимание на наличие памяти",
+          "Проверь, есть ли у агента цели",
+          "Может ли агент обучаться?"
+        ]
+      }
+    ],
+    "quiz": {
+      "id": "quiz-foundation-01",
+      "title": "Проверка знаний: AI агенты",
+      "passingScore": 70,
+      "questions": [
+        {
+          "id": "q1",
+          "question": "Что НЕ является ключевой характеристикой AI агента?",
+          "type": "multiple_choice",
+          "options": [
+            "Автономность",
+            "Детерминированность",
+            "Реактивность",
+            "Проактивность"
+          ],
+          "correctAnswer": "Детерминированность",
+          "explanation": "AI агенты часто используют стохастические методы и не обязаны быть полностью детерминированными. Детерминированность означает, что при одинаковых входных данных всегда получается одинаковый результат, что не всегда применимо к AI агентам.",
+          "points": 10
+        },
+        {
+          "id": "q2",
+          "question": "Какой паттерн сочетает рассуждение и действие?",
+          "type": "multiple_choice",
+          "options": [
+            "Plan-and-Execute",
+            "ReAct",
+            "Reflection",
+            "Chain-of-Thought"
+          ],
+          "correctAnswer": "ReAct",
+          "explanation": "ReAct (Reasoning + Acting) - это паттерн, который объединяет рассуждения (Thought) с действиями (Action) и наблюдениями (Observation).",
+          "points": 10
+        },
+        {
+          "id": "q3",
+          "question": "Выбери все компоненты современного LLM-агента:",
+          "type": "multiple_select",
+          "options": [
+            "Language Model",
+            "Tools/Functions",
+            "Memory",
+            "Hardcoded Rules",
+            "Reflection механизм"
+          ],
+          "correctAnswer": [
+            "Language Model",
+            "Tools/Functions",
+            "Memory",
+            "Reflection механизм"
+          ],
+          "explanation": "Современные LLM-агенты используют языковую модель, инструменты для взаимодействия с внешним миром, систему памяти и механизмы саморефлексии. Жестко закодированные правила - это характеристика старых систем.",
+          "points": 15
+        }
+      ]
+    }
+  },
+  "completionCount": 0,
+  "averageRating": 0,
+  "averageCompletionTime": 0,
+  "createdAt": "2025-01-15T00:00:00Z",
+  "updatedAt": "2025-01-15T00:00:00Z"
+}

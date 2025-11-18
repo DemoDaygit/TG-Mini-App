@@ -1,0 +1,181 @@
+{
+  "id": "architecture-01-agent-components",
+  "title": "Архитектура AI агента: Ключевые компоненты",
+  "description": "Глубокое погружение в архитектуру современных AI агентов. Изучение компонентов: восприятие, рассуждение, планирование, действие и память.",
+  "category": "architecture",
+  "difficulty": "medium",
+  "estimatedMinutes": 45,
+  "prerequisites": ["foundation-01-what-are-ai-agents"],
+  "skills": [
+    "agent-architecture",
+    "perception-systems",
+    "reasoning-engines",
+    "planning-algorithms",
+    "memory-systems"
+  ],
+  "tags": [
+    "архитектура",
+    "компоненты",
+    "восприятие",
+    "рассуждение",
+    "память"
+  ],
+  "content": {
+    "type": "guide",
+    "sections": [
+      {
+        "id": "section-1",
+        "title": "Perception: Восприятие информации",
+        "order": 1,
+        "blocks": [
+          {
+            "type": "text",
+            "content": "# Perception Layer: Как агенты воспринимают мир\n\n**Восприятие** - первый и критически важный компонент любого AI агента. Это процесс получения и предварительной обработки информации из окружающей среды.\n\n## Источники информации\n\n### 1. Текстовый ввод\n- Пользовательские запросы\n- Документы и файлы\n- API ответы\n- Веб-страницы\n\n### 2. Структурированные данные\n- Базы данных\n- JSON/XML ответы\n- Таблицы и spreadsheets\n- Метрики и логи\n\n### 3. Мультимодальный ввод\n- Изображения (Vision)\n- Аудио (Speech-to-Text)\n- Видео\n- Сенсорные данные\n\n### 4. Контекстная информация\n- История взаимодействий\n- Текущее состояние системы\n- Временные данные\n- Пользовательские предпочтения"
+          },
+          {
+            "type": "code",
+            "language": "typescript",
+            "code": "// Perception System для AI агента\ninterface PerceptionInput {\n  type: 'text' | 'image' | 'audio' | 'structured';\n  data: any;\n  metadata?: {\n    timestamp: Date;\n    source: string;\n    priority: number;\n  };\n}\n\nclass PerceptionLayer {\n  private processors: Map<string, InputProcessor>;\n  \n  constructor() {\n    this.processors = new Map([\n      ['text', new TextProcessor()],\n      ['image', new VisionProcessor()],\n      ['audio', new AudioProcessor()],\n      ['structured', new DataProcessor()]\n    ]);\n  }\n\n  async perceive(inputs: PerceptionInput[]): Promise<ProcessedPercept[]> {\n    // Параллельная обработка всех входов\n    const processed = await Promise.all(\n      inputs.map(input => this.processInput(input))\n    );\n    \n    // Объединение и нормализация\n    return this.normalize(processed);\n  }\n\n  private async processInput(input: PerceptionInput): Promise<ProcessedPercept> {\n    const processor = this.processors.get(input.type);\n    if (!processor) {\n      throw new Error(`Unknown input type: ${input.type}`);\n    }\n    \n    // Применяем соответствующий процессор\n    const features = await processor.extract(input.data);\n    \n    return {\n      type: input.type,\n      features,\n      metadata: input.metadata,\n      embedding: await this.generateEmbedding(features)\n    };\n  }\n\n  private normalize(percepts: ProcessedPercept[]): ProcessedPercept[] {\n    // Нормализация и фильтрация\n    return percepts\n      .filter(p => p.features.length > 0)\n      .sort((a, b) => (b.metadata?.priority ?? 0) - (a.metadata?.priority ?? 0));\n  }\n\n  private async generateEmbedding(features: any): Promise<number[]> {\n    // Генерация векторного представления\n    // Используется для семантического поиска и сравнения\n    return embedModel.encode(features);\n  }\n}",
+            "explanation": "Perception Layer обрабатывает различные типы входных данных, извлекает признаки и создает единое представление для дальнейшей обработки",
+            "runnable": false
+          }
+        ]
+      },
+      {
+        "id": "section-2",
+        "title": "Reasoning: Движок рассуждений",
+        "order": 2,
+        "blocks": [
+          {
+            "type": "text",
+            "content": "# Reasoning Engine: Как агенты думают\n\n**Рассуждение** - ядро AI агента, где происходит анализ информации и выработка решений.\n\n## Типы рассуждений\n\n### 1. Deductive Reasoning (Дедуктивное)\nОт общего к частному. Применение правил и логики.\n\n```\nПравило: Все ML модели требуют данных\nФакт: GPT-4 - это ML модель\nВывод: GPT-4 требует данных\n```\n\n### 2. Inductive Reasoning (Индуктивное)\nОт частного к общему. Обобщение на основе примеров.\n\n```\nПример 1: Пользователь А завершил модуль за 20 минут\nПример 2: Пользователь Б завершил модуль за 22 минуты\nПример 3: Пользователь В завершил модуль за 18 минут\nВывод: Модуль занимает примерно 20 минут\n```\n\n### 3. Abductive Reasoning (Абдуктивное)\nПоиск лучшего объяснения.\n\n```\nНаблюдение: Пользователь не завершил модуль\nГипотеза 1: Модуль слишком сложный\nГипотеза 2: У пользователя не было времени\nГипотеза 3: Модуль неинтересный\nВыбор: Наиболее вероятное объяснение на основе данных\n```\n\n### 4. Analogical Reasoning (По аналогии)\nПрименение знаний из похожих ситуаций.\n\n```\nПрошлая ситуация: Пользователь успешен в практических модулях\nТекущая ситуация: Новый модуль с практикой\nВывод: Пользователь, вероятно, успешно завершит\n```"
+          },
+          {
+            "type": "code",
+            "language": "python",
+            "code": "# Chain-of-Thought Reasoning\nclass ChainOfThoughtReasoner:\n    def __init__(self, llm):\n        self.llm = llm\n        self.thought_chain = []\n    \n    async def reason(self, problem: str) -> str:\n        \"\"\"Пошаговое рассуждение над проблемой\"\"\"\n        \n        # Промпт для пошагового рассуждения\n        prompt = f\"\"\"\n        Решите следующую задачу, рассуждая шаг за шагом:\n        \n        Задача: {problem}\n        \n        Давайте подумаем пошагово:\n        \"\"\"\n        \n        # Получаем цепочку рассуждений\n        response = await self.llm.generate(prompt)\n        \n        # Парсим шаги\n        thoughts = self.parse_thoughts(response)\n        self.thought_chain.extend(thoughts)\n        \n        # Извлекаем финальный ответ\n        answer = self.extract_answer(response)\n        \n        return answer\n    \n    def parse_thoughts(self, response: str) -> list[str]:\n        \"\"\"Извлекает отдельные шаги рассуждения\"\"\"\n        lines = response.split('\\n')\n        thoughts = []\n        \n        for line in lines:\n            if line.strip().startswith(('Step', 'Шаг', '1.', '2.')):\n                thoughts.append(line.strip())\n        \n        return thoughts\n    \n    def extract_answer(self, response: str) -> str:\n        \"\"\"Извлекает финальный ответ\"\"\"\n        # Ищем маркеры ответа\n        markers = ['Answer:', 'Ответ:', 'Therefore:', 'Следовательно:']\n        \n        for marker in markers:\n            if marker in response:\n                return response.split(marker)[-1].strip()\n        \n        return response.split('\\n')[-1].strip()\n\n# Tree-of-Thoughts Reasoning\nclass TreeOfThoughtsReasoner:\n    def __init__(self, llm):\n        self.llm = llm\n        self.tree = ThoughtTree()\n    \n    async def reason(self, problem: str, branching_factor: int = 3) -> str:\n        \"\"\"Рассуждение с исследованием нескольких путей\"\"\"\n        \n        # Корень дерева - начальная проблема\n        root = ThoughtNode(problem)\n        self.tree.add_node(root)\n        \n        # Итеративное расширение дерева\n        for depth in range(3):  # 3 уровня глубины\n            leaves = self.tree.get_leaves()\n            \n            for leaf in leaves:\n                # Генерируем несколько возможных следующих шагов\n                next_thoughts = await self.generate_next_thoughts(\n                    leaf, \n                    count=branching_factor\n                )\n                \n                # Оцениваем каждый вариант\n                for thought in next_thoughts:\n                    score = await self.evaluate_thought(thought)\n                    node = ThoughtNode(thought, score=score)\n                    self.tree.add_child(leaf, node)\n        \n        # Находим лучший путь через дерево\n        best_path = self.tree.find_best_path()\n        \n        # Синтезируем финальный ответ\n        return self.synthesize_answer(best_path)\n    \n    async def evaluate_thought(self, thought: str) -> float:\n        \"\"\"Оценивает качество рассуждения\"\"\"\n        prompt = f\"\"\"\n        Оцените следующее рассуждение по шкале от 0 до 1:\n        {thought}\n        \n        Критерии:\n        - Логичность\n        - Полнота\n        - Релевантность\n        \n        Оценка:\n        \"\"\"\n        \n        response = await self.llm.generate(prompt)\n        return float(response.strip())",
+            "explanation": "Два продвинутых метода рассуждения: Chain-of-Thought для последовательного мышления и Tree-of-Thoughts для исследования множества путей решения",
+            "runnable": false
+          }
+        ]
+      },
+      {
+        "id": "section-3",
+        "title": "Planning: Система планирования",
+        "order": 3,
+        "blocks": [
+          {
+            "type": "text",
+            "content": "# Planning: Построение стратегии действий\n\n**Планирование** - создание последовательности действий для достижения цели.\n\n## Подходы к планированию\n\n### 1. Task Decomposition (Декомпозиция задач)\nРазбиение сложной задачи на подзадачи.\n\n```\nЗадача: Создать AI агента для customer support\n\nПлан:\n├─ 1. Анализ требований\n│  ├─ 1.1 Определить типы запросов\n│  ├─ 1.2 Изучить существующие решения\n│  └─ 1.3 Собрать примеры диалогов\n├─ 2. Проектирование архитектуры\n│  ├─ 2.1 Выбрать LLM\n│  ├─ 2.2 Спроектировать flow\n│  └─ 2.3 Определить инструменты\n├─ 3. Разработка\n│  ├─ 3.1 Настроить промпты\n│  ├─ 3.2 Реализовать инструменты\n│  └─ 3.3 Интегрировать memory\n└─ 4. Тестирование и деплой\n```\n\n### 2. Hierarchical Planning (Иерархическое планирование)\nПланирование на разных уровнях абстракции.\n\n**Высокий уровень:** Что нужно сделать?\n**Средний уровень:** Как это сделать?\n**Низкий уровень:** Конкретные действия\n\n### 3. Reactive Planning (Реактивное планирование)\nАдаптация плана в зависимости от результатов.\n\n```python\nplan = create_initial_plan(goal)\n\nwhile not goal_achieved:\n    action = plan.next_action()\n    result = execute(action)\n    \n    if result.failed:\n        # Пересмотр плана\n        plan = replan(plan, result)\n    \n    if environment_changed:\n        # Адаптация к изменениям\n        plan = adapt_plan(plan, new_state)\n```"
+          },
+          {
+            "type": "code",
+            "language": "typescript",
+            "code": "// Продвинутая система планирования\ninterface Task {\n  id: string;\n  description: string;\n  dependencies: string[];\n  estimatedCost: number;\n  priority: number;\n}\n\ninterface Plan {\n  goal: string;\n  tasks: Task[];\n  executionOrder: string[];\n}\n\nclass AdvancedPlanner {\n  constructor(\n    private llm: LanguageModel,\n    private knowledgeBase: KnowledgeBase\n  ) {}\n\n  async createPlan(goal: string, constraints?: Constraints): Promise<Plan> {\n    // 1. Декомпозиция цели\n    const tasks = await this.decomposeGoal(goal);\n    \n    // 2. Анализ зависимостей\n    const taskGraph = this.buildDependencyGraph(tasks);\n    \n    // 3. Оптимизация порядка выполнения\n    const executionOrder = this.optimizeExecution(taskGraph, constraints);\n    \n    return {\n      goal,\n      tasks,\n      executionOrder\n    };\n  }\n\n  private async decomposeGoal(goal: string): Promise<Task[]> {\n    // Используем LLM для декомпозиции\n    const prompt = `\n      Разбей следующую цель на конкретные подзадачи:\n      \n      Цель: ${goal}\n      \n      Для каждой подзадачи укажи:\n      - Описание\n      - Зависимости (от каких других задач зависит)\n      - Приоритет (1-10)\n      \n      Формат ответа: JSON\n    `;\n    \n    const response = await this.llm.generate(prompt);\n    const tasks = JSON.parse(response);\n    \n    // Добавляем оценку стоимости\n    for (const task of tasks) {\n      task.estimatedCost = await this.estimateTaskCost(task);\n    }\n    \n    return tasks;\n  }\n\n  private buildDependencyGraph(tasks: Task[]): TaskGraph {\n    const graph = new TaskGraph();\n    \n    for (const task of tasks) {\n      graph.addNode(task.id, task);\n    }\n    \n    for (const task of tasks) {\n      for (const depId of task.dependencies) {\n        graph.addEdge(depId, task.id);\n      }\n    }\n    \n    // Проверка на циклы\n    if (graph.hasCycles()) {\n      throw new Error('Циклические зависимости в плане!');\n    }\n    \n    return graph;\n  }\n\n  private optimizeExecution(\n    graph: TaskGraph,\n    constraints?: Constraints\n  ): string[] {\n    // Топологическая сортировка с учетом приоритетов\n    const sorted = graph.topologicalSort();\n    \n    // Оптимизация под constraints\n    if (constraints?.maxParallelTasks) {\n      return this.parallelizeExecution(sorted, constraints.maxParallelTasks);\n    }\n    \n    if (constraints?.maxTime) {\n      return this.optimizeForTime(sorted, constraints.maxTime);\n    }\n    \n    // По умолчанию - сортировка по приоритету\n    return this.sortByPriority(sorted);\n  }\n\n  // Адаптивное перепланирование\n  async replan(\n    originalPlan: Plan,\n    executedTasks: string[],\n    failedTask?: string,\n    newContext?: any\n  ): Promise<Plan> {\n    // Анализируем, что пошло не так\n    const analysis = await this.analyzeFailure(failedTask, newContext);\n    \n    // Оставшиеся задачи\n    const remainingTasks = originalPlan.tasks.filter(\n      t => !executedTasks.includes(t.id)\n    );\n    \n    // Создаем альтернативные задачи если нужно\n    if (failedTask && analysis.needsAlternative) {\n      const alternative = await this.generateAlternativeTask(\n        originalPlan.tasks.find(t => t.id === failedTask)!,\n        analysis.reason\n      );\n      remainingTasks.push(alternative);\n    }\n    \n    // Пересоздаем план\n    return this.createPlan(\n      originalPlan.goal,\n      { existingTasks: remainingTasks }\n    );\n  }\n}",
+            "explanation": "Продвинутая система планирования с декомпозицией задач, анализом зависимостей, оптимизацией выполнения и адаптивным перепланированием",
+            "runnable": false
+          }
+        ]
+      },
+      {
+        "id": "section-4",
+        "title": "Memory: Системы памяти",
+        "order": 4,
+        "blocks": [
+          {
+            "type": "text",
+            "content": "# Memory Systems: Память AI агента\n\n**Память** - критический компонент для поддержания контекста и обучения.\n\n## Типы памяти\n\n### 1. Short-term Memory (Краткосрочная)\n- Контекст текущей сессии\n- Ограничена размером контекстного окна LLM\n- Используется для немедленных решений\n\n**Ограничения:**\n- GPT-4: 128K tokens (~300 страниц)\n- Claude: 200K tokens (~500 страниц)\n- Теряется после сессии\n\n### 2. Long-term Memory (Долгосрочная)\n- Персистентное хранилище знаний\n- Vector databases (Pinecone, Qdrant, Weaviate)\n- Позволяет \"вспоминать\" прошлый опыт\n\n**Реализация:**\n```\nUser Query → Embedding → Vector Search → Relevant Memories → Context\n```\n\n### 3. Episodic Memory (Эпизодическая)\n- Запись конкретных событий и взаимодействий\n- \"Что произошло, когда и почему\"\n- Полезна для саморефлексии и обучения\n\n### 4. Semantic Memory (Семантическая)\n- Общие знания и факты\n- Концепции и их связи\n- Knowledge graphs\n\n### 5. Procedural Memory (Процедурная)\n- \"Как\" делать вещи\n- Выученные навыки и процедуры\n- Оптимизированные стратегии"
+          },
+          {
+            "type": "code",
+            "language": "typescript",
+            "code": "// Комплексная система памяти\nclass AgentMemorySystem {\n  private shortTerm: ConversationBuffer;\n  private longTerm: VectorStore;\n  private episodic: EpisodicStore;\n  private semantic: KnowledgeGraph;\n\n  constructor() {\n    this.shortTerm = new ConversationBuffer(maxTokens: 8000);\n    this.longTerm = new VectorStore({\n      provider: 'pinecone',\n      dimension: 1536,  // OpenAI embeddings\n      metric: 'cosine'\n    });\n    this.episodic = new EpisodicStore();\n    this.semantic = new KnowledgeGraph();\n  }\n\n  async remember(query: string, context?: any): Promise<Memory[]> {\n    // Многоуровневый поиск в памяти\n    const [shortTermResults, longTermResults, episodicResults] = \n      await Promise.all([\n        this.searchShortTerm(query),\n        this.searchLongTerm(query),\n        this.searchEpisodic(query)\n      ]);\n\n    // Объединение и ранжирование результатов\n    const allMemories = [\n      ...shortTermResults,\n      ...longTermResults,\n      ...episodicResults\n    ];\n\n    return this.rankMemories(allMemories, query, context);\n  }\n\n  async store(interaction: Interaction): Promise<void> {\n    // Сохранение в краткосрочную память\n    this.shortTerm.add(interaction);\n\n    // Определяем важность\n    const importance = await this.assessImportance(interaction);\n\n    // Если важно - сохраняем в долгосрочную\n    if (importance > 0.7) {\n      const embedding = await this.generateEmbedding(\n        interaction.content\n      );\n      \n      await this.longTerm.upsert({\n        id: interaction.id,\n        vector: embedding,\n        metadata: {\n          content: interaction.content,\n          timestamp: interaction.timestamp,\n          importance,\n          tags: interaction.tags\n        }\n      });\n\n      // Сохранение как эпизод\n      await this.episodic.store({\n        what: interaction.content,\n        when: interaction.timestamp,\n        where: interaction.context,\n        why: interaction.intent,\n        outcome: interaction.result\n      });\n    }\n\n    // Извлечение знаний для semantic memory\n    const knowledge = await this.extractKnowledge(interaction);\n    if (knowledge) {\n      await this.semantic.addKnowledge(knowledge);\n    }\n  }\n\n  private async searchLongTerm(query: string): Promise<Memory[]> {\n    const queryEmbedding = await this.generateEmbedding(query);\n    \n    const results = await this.longTerm.query({\n      vector: queryEmbedding,\n      topK: 5,\n      filter: {\n        // Можно фильтровать по времени, тегам и т.д.\n      }\n    });\n\n    return results.matches.map(match => ({\n      content: match.metadata.content,\n      relevance: match.score,\n      timestamp: match.metadata.timestamp,\n      type: 'long-term'\n    }));\n  }\n\n  private async assessImportance(interaction: Interaction): Promise<number> {\n    // Факторы важности:\n    const factors = {\n      userFeedback: interaction.feedback ? 0.3 : 0,\n      novelty: await this.calculateNovelty(interaction),\n      emotionalSalience: this.detectEmotion(interaction),\n      goalRelevance: await this.assessGoalRelevance(interaction)\n    };\n\n    return Object.values(factors).reduce((a, b) => a + b, 0) / 4;\n  }\n\n  // Периодическая консолидация памяти\n  async consolidate(): Promise<void> {\n    // 1. Удаление дубликатов\n    await this.deduplicateMemories();\n\n    // 2. Обобщение связанных воспоминаний\n    const clusters = await this.clusterMemories();\n    for (const cluster of clusters) {\n      const summary = await this.summarizeCluster(cluster);\n      await this.store(summary);\n    }\n\n    // 3. Забывание неважных воспоминаний\n    await this.forgetIrrelevant();\n\n    // 4. Укрепление важных паттернов\n    await this.reinforcePatterns();\n  }\n\n  private async forgetIrrelevant(): Promise<void> {\n    // Decay function: важность уменьшается со временем\n    const now = Date.now();\n    const memories = await this.longTerm.list();\n\n    for (const memory of memories) {\n      const age = now - memory.metadata.timestamp;\n      const ageInDays = age / (1000 * 60 * 60 * 24);\n      \n      // Экспоненциальный decay\n      const decayedImportance = \n        memory.metadata.importance * Math.exp(-ageInDays / 30);\n\n      if (decayedImportance < 0.1) {\n        // Забываем\n        await this.longTerm.delete(memory.id);\n      } else {\n        // Обновляем важность\n        await this.longTerm.update(memory.id, {\n          importance: decayedImportance\n        });\n      }\n    }\n  }\n}",
+            "explanation": "Комплексная система памяти с краткосрочным, долгосрочным, эпизодическим и семантическим хранилищами. Включает механизмы консолидации и забывания.",
+            "runnable": false
+          }
+        ]
+      },
+      {
+        "id": "section-5",
+        "title": "Action: Выполнение действий",
+        "order": 5,
+        "blocks": [
+          {
+            "type": "text",
+            "content": "# Action Execution: Взаимодействие с миром\n\n**Действия** - способ агента влиять на окружающую среду.\n\n## Типы действий\n\n### 1. Tool/Function Calling\nВызов внешних функций и API\n\n```typescript\nconst tools = [\n  {\n    name: 'search_web',\n    description: 'Поиск информации в интернете',\n    parameters: {\n      query: 'string',\n      max_results: 'number'\n    }\n  },\n  {\n    name: 'send_email',\n    description: 'Отправка email',\n    parameters: {\n      to: 'string',\n      subject: 'string',\n      body: 'string'\n    }\n  }\n];\n```\n\n### 2. Code Execution\nВыполнение сгенерированного кода\n\n```python\n# Агент генерирует и выполняет Python код\ncode = agent.generate_code(task)\nresult = execute_in_sandbox(code)\n```\n\n### 3. API Interactions\nВзаимодействие с внешними сервисами\n\n### 4. Database Operations\nЧтение и запись данных\n\n### 5. File System Operations\nРабота с файлами\n\n## Tool Use Pattern\n\n```\nAgent: Нужно узнать текущую погоду\n  ↓\n[Tool Selection] → weather_api\n  ↓\n[Parameter Extraction] → {city: \"Moscow\"}\n  ↓\n[Execution] → Call API\n  ↓\n[Result Processing] → Parse response\n  ↓\nAgent: Получил результат, использую в ответе\n```"
+          },
+          {
+            "type": "code",
+            "language": "python",
+            "code": "# Продвинутая система выполнения действий\nfrom typing import Any, Callable, Dict, List\nfrom dataclasses import dataclass\n\n@dataclass\nclass Tool:\n    name: str\n    description: str\n    function: Callable\n    parameters: Dict[str, Any]\n    requires_confirmation: bool = False\n    \nclass ActionExecutor:\n    def __init__(self):\n        self.tools = {}\n        self.execution_history = []\n        self.safety_checker = SafetyChecker()\n    \n    def register_tool(self, tool: Tool):\n        \"\"\"Регистрация нового инструмента\"\"\"\n        self.tools[tool.name] = tool\n    \n    async def execute(self, action: Action) -> ActionResult:\n        \"\"\"Выполнение действия с полным циклом обработки\"\"\"\n        \n        # 1. Валидация\n        validation = await self.validate_action(action)\n        if not validation.valid:\n            return ActionResult(\n                success=False,\n                error=validation.error\n            )\n        \n        # 2. Проверка безопасности\n        safety_check = await self.safety_checker.check(action)\n        if not safety_check.safe:\n            return ActionResult(\n                success=False,\n                error=f\"Safety check failed: {safety_check.reason}\"\n            )\n        \n        # 3. Подтверждение если требуется\n        tool = self.tools[action.tool_name]\n        if tool.requires_confirmation:\n            confirmed = await self.request_confirmation(action)\n            if not confirmed:\n                return ActionResult(\n                    success=False,\n                    cancelled=True\n                )\n        \n        # 4. Выполнение\n        try:\n            result = await self.execute_tool(\n                tool,\n                action.parameters\n            )\n            \n            # 5. Запись в историю\n            self.execution_history.append({\n                'action': action,\n                'result': result,\n                'timestamp': datetime.now()\n            })\n            \n            return ActionResult(\n                success=True,\n                data=result\n            )\n            \n        except Exception as e:\n            # Обработка ошибок\n            return await self.handle_error(action, e)\n    \n    async def execute_with_retry(\n        self,\n        action: Action,\n        max_retries: int = 3\n    ) -> ActionResult:\n        \"\"\"Выполнение с retry логикой\"\"\"\n        \n        for attempt in range(max_retries):\n            result = await self.execute(action)\n            \n            if result.success:\n                return result\n            \n            # Анализ ошибки\n            if result.error and 'rate limit' in result.error.lower():\n                # Exponential backoff\n                await asyncio.sleep(2 ** attempt)\n                continue\n            \n            if result.error and 'timeout' in result.error.lower():\n                # Увеличиваем timeout\n                action.timeout *= 2\n                continue\n            \n            # Неисправимая ошибка\n            break\n        \n        return result\n    \n    async def execute_parallel(\n        self,\n        actions: List[Action]\n    ) -> List[ActionResult]:\n        \"\"\"Параллельное выполнение независимых действий\"\"\"\n        \n        # Проверка зависимостей\n        independent_groups = self.group_by_dependencies(actions)\n        \n        results = []\n        for group in independent_groups:\n            # Группа выполняется параллельно\n            group_results = await asyncio.gather(*[\n                self.execute(action) for action in group\n            ])\n            results.extend(group_results)\n        \n        return results\n\n# Пример использования\nexecutor = ActionExecutor()\n\n# Регистрируем инструменты\nexecutor.register_tool(Tool(\n    name='search_web',\n    description='Search the web',\n    function=search_web_function,\n    parameters={'query': str, 'max_results': int}\n))\n\n# Выполняем действие\nresult = await executor.execute(Action(\n    tool_name='search_web',\n    parameters={'query': 'AI agents', 'max_results': 5}\n))",
+            "explanation": "Продвинутая система выполнения действий с валидацией, проверкой безопасности, retry логикой и параллельным выполнением",
+            "runnable": false
+          }
+        ]
+      }
+    ],
+    "exercises": [
+      {
+        "id": "exercise-arch-1",
+        "title": "Проектирование агента",
+        "description": "Спроектируй архитектуру AI агента для конкретного use case",
+        "type": "architecture_design",
+        "difficulty": "medium",
+        "instructions": "Выбери один из use cases и спроектируй полную архитектуру агента, включая все 5 компонентов",
+        "hints": [
+          "Начни с определения входных данных (Perception)",
+          "Определи, какие типы рассуждений нужны",
+          "Подумай о системе планирования",
+          "Какая память нужна для этого агента?",
+          "Какие действия он должен уметь выполнять?"
+        ]
+      }
+    ],
+    "quiz": {
+      "id": "quiz-architecture-01",
+      "title": "Архитектура AI агентов",
+      "passingScore": 75,
+      "questions": [
+        {
+          "id": "q1",
+          "question": "Какой компонент отвечает за создание последовательности действий?",
+          "type": "multiple_choice",
+          "options": [
+            "Perception",
+            "Reasoning",
+            "Planning",
+            "Memory"
+          ],
+          "correctAnswer": "Planning",
+          "explanation": "Planning (планирование) - это компонент, который создает последовательность действий для достижения целей.",
+          "points": 10
+        },
+        {
+          "id": "q2",
+          "question": "Какие типы памяти используются в современных AI агентах?",
+          "type": "multiple_select",
+          "options": [
+            "Short-term (краткосрочная)",
+            "Long-term (долгосрочная)",
+            "Episodic (эпизодическая)",
+            "Semantic (семантическая)",
+            "Photographic (фотографическая)"
+          ],
+          "correctAnswer": [
+            "Short-term (краткосрочная)",
+            "Long-term (долгосрочная)",
+            "Episodic (эпизодическая)",
+            "Semantic (семантическая)"
+          ],
+          "explanation": "AI агенты используют несколько типов памяти, аналогично человеческой памяти. Фотографическая память не является стандартным типом для AI агентов.",
+          "points": 15
+        }
+      ]
+    }
+  },
+  "completionCount": 0,
+  "averageRating": 0,
+  "averageCompletionTime": 0,
+  "createdAt": "2025-01-15T00:00:00Z",
+  "updatedAt": "2025-01-15T00:00:00Z"
+}

@@ -1,0 +1,1 @@
+{"name":"bot-service","version":"1.0.0","description":"Telegram Bot Service for payments and notifications","main":"src/index.ts","scripts":{"start":"ts-node src/index.ts"},"keywords":["telegram","bot","grammy"],"author":"","license":"ISC","dependencies":{"@types/node":"^24.10.1","dotenv":"^17.2.3","grammy":"^1.38.3","ts-node":"^10.9.2","typescript":"^5.9.3"}}

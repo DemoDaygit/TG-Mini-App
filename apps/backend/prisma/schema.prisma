@@ -1,0 +1,161 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  telegramId    BigInt   @unique
+  username      String?
+  firstName     String?
+  lastName      String?
+  languageCode  String?
+  isPremium     Boolean  @default(false)
+
+  // Profile
+  level         String   @default("beginner") // beginner, intermediate, advanced, expert
+  currentXP     Int      @default(0)
+  totalXP       Int      @default(0)
+  learningStyle String   @default("mixed") // visual, practical, theoretical, mixed
+
+  // Stats
+  totalModulesCompleted Int @default(0)
+  totalTimeSpentMinutes Int @default(0)
+  currentStreak         Int @default(0)
+  longestStreak         Int @default(0)
+  completionRate        Float @default(0)
+
+  // Timestamps
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  lastActiveAt  DateTime @default(now())
+
+  // Relations
+  progress      ModuleProgress[]
+  achievements  Achievement[]
+  skills        UserSkill[]
+  analytics     AnalyticsEvent[]
+
+  @@index([telegramId])
+  @@index([lastActiveAt])
+}
+
+model LearningModule {
+  id                    String   @id @default(cuid())
+  moduleId              String   @unique // foundation-01-what-are-ai-agents
+  title                 String
+  description           String
+  category              String   // foundation, architecture, development, advanced, projects
+  difficulty            String   // easy, medium, hard, expert
+
+  estimatedMinutes      Int
+  prerequisites         String[] // Array of module IDs
+  skills                String[] // Skills this module teaches
+  tags                  String[]
+
+  content               Json     // Full module content
+
+  // Statistics
+  completionCount       Int      @default(0)
+  averageRating         Float    @default(0)
+  averageCompletionTime Int      @default(0)
+
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relations
+  progress              ModuleProgress[]
+
+  @@index([category, difficulty])
+}
+
+model ModuleProgress {
+  id                    String   @id @default(cuid())
+  userId                String
+  moduleId              String
+
+  status                String   @default("not_started") // not_started, in_progress, completed, mastered
+
+  startedAt             DateTime?
+  completedAt           DateTime?
+  lastAccessedAt        DateTime @default(now())
+
+  timeSpentMinutes      Int      @default(0)
+  completionPercentage  Float    @default(0)
+
+  sectionsCompleted     String[] // Array of section IDs
+  exercisesData         Json?    // Exercise progress data
+  quizResults           Json?    // Quiz results
+
+  notes                 String?
+  bookmarked            Boolean  @default(false)
+
+  // Relations
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  module                LearningModule @relation(fields: [moduleId], references: [id])
+
+  @@unique([userId, moduleId])
+  @@index([userId, status])
+}
+
+model UserSkill {
+  id                String   @id @default(cuid())
+  userId            String
+  skillId           String
+  skillName         String
+
+  level             Int      @default(0) // 0-100
+  masteryScore      Float    @default(0)
+  practiceCount     Int      @default(0)
+
+  acquiredAt        DateTime @default(now())
+  lastPracticedAt   DateTime @default(now())
+
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, skillId])
+  @@index([userId])
+}
+
+model Achievement {
+  id            String   @id @default(cuid())
+  userId        String
+
+  achievementId String
+  type          String   // milestone, streak, mastery, speed, community, special
+  name          String
+  description   String
+  iconUrl       String?
+
+  earnedAt      DateTime @default(now())
+  progress      Float?   // For progressive achievements
+  xpReward      Int      @default(0)
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+  @@index([userId])
+}
+
+model AnalyticsEvent {
+  id            String   @id @default(cuid())
+  userId        String
+
+  eventType     String   // module_started, module_completed, exercise_attempted, etc.
+  eventData     Json
+
+  sessionId     String
+  timestamp     DateTime @default(now())
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, eventType])
+  @@index([timestamp])
+}

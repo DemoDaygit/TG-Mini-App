@@ -1,0 +1,142 @@
+{
+  "id": "development-01-langchain-agents",
+  "title": "Разработка AI агентов с LangChain",
+  "description": "Практическое руководство по созданию AI агентов используя LangChain и LangGraph. От базовых концепций до продвинутых паттернов.",
+  "category": "development",
+  "difficulty": "medium",
+  "estimatedMinutes": 60,
+  "prerequisites": [
+    "foundation-01-what-are-ai-agents",
+    "architecture-01-agent-components"
+  ],
+  "skills": [
+    "langchain",
+    "langgraph",
+    "agent-development",
+    "tool-creation",
+    "agent-orchestration"
+  ],
+  "tags": [
+    "langchain",
+    "практика",
+    "разработка",
+    "agents",
+    "tools"
+  ],
+  "content": {
+    "type": "workshop",
+    "sections": [
+      {
+        "id": "section-1",
+        "title": "Введение в LangChain",
+        "order": 1,
+        "blocks": [
+          {
+            "type": "text",
+            "content": "# LangChain: Фреймворк для AI приложений\n\n**LangChain** - самый популярный фреймворк для разработки приложений на основе языковых моделей.\n\n## Ключевые преимущества\n\n✅ **Модульность** - гибкие building blocks\n✅ **Абстракция** - единый интерфейс для разных LLM\n✅ **Богатая экосистема** - готовые интеграции\n✅ **Production-ready** - инструменты для продакшена\n✅ **Активное сообщество** - большая база знаний\n\n## Основные концепции\n\n### 1. Models\nПодключение к различным LLM\n\n```python\nfrom langchain_openai import ChatOpenAI\nfrom langchain_anthropic import ChatAnthropic\n\n# OpenAI\nmodel = ChatOpenAI(model=\"gpt-4\")\n\n# Anthropic Claude\nmodel = ChatAnthropic(model=\"claude-3-opus-20240229\")\n```\n\n### 2. Prompts\nШаблоны для промптов\n\n```python\nfrom langchain.prompts import ChatPromptTemplate\n\nprompt = ChatPromptTemplate.from_messages([\n    (\"system\", \"You are a helpful AI assistant.\"),\n    (\"human\", \"{input}\")\n])\n```\n\n### 3. Chains\nПоследовательности операций\n\n```python\nchain = prompt | model | output_parser\nresult = chain.invoke({\"input\": \"Hello!\"})\n```\n\n### 4. Agents\nАвтономные системы принятия решений\n\n### 5. Memory\nСохранение контекста\n\n### 6. Tools\nФункции для расширения возможностей"
+          }
+        ]
+      },
+      {
+        "id": "section-2",
+        "title": "Создание первого агента",
+        "order": 2,
+        "blocks": [
+          {
+            "type": "text",
+            "content": "# Создаем простого ReAct агента\n\nReAct (Reasoning + Acting) - паттерн, где агент рассуждает и действует итеративно."
+          },
+          {
+            "type": "code",
+            "language": "python",
+            "code": "from langchain_openai import ChatOpenAI\nfrom langchain.agents import AgentExecutor, create_react_agent\nfrom langchain.tools import Tool\nfrom langchain import hub\nimport requests\n\n# 1. Определяем инструменты (tools)\ndef search_web(query: str) -> str:\n    \"\"\"Поиск информации в интернете\"\"\"\n    # Упрощенная реализация\n    return f\"Результаты поиска для: {query}\"\n\ndef calculate(expression: str) -> str:\n    \"\"\"Вычисление математических выражений\"\"\"\n    try:\n        result = eval(expression)\n        return f\"Результат: {result}\"\n    except Exception as e:\n        return f\"Ошибка: {str(e)}\"\n\ndef get_weather(city: str) -> str:\n    \"\"\"Получение текущей погоды\"\"\"\n    # API call к сервису погоды\n    return f\"Погода в {city}: 15°C, облачно\"\n\n# 2. Создаем список tools\ntools = [\n    Tool(\n        name=\"WebSearch\",\n        func=search_web,\n        description=\"Полезно когда нужно найти информацию в интернете. Входные данные: поисковый запрос.\"\n    ),\n    Tool(\n        name=\"Calculator\",\n        func=calculate,\n        description=\"Полезно для математических вычислений. Входные данные: математическое выражение.\"\n    ),\n    Tool(\n        name=\"Weather\",\n        func=get_weather,\n        description=\"Получение информации о погоде. Входные данные: название города.\"\n    )\n]\n\n# 3. Инициализируем LLM\nllm = ChatOpenAI(\n    model=\"gpt-4\",\n    temperature=0  # Для более детерминированного поведения\n)\n\n# 4. Загружаем промпт для ReAct агента\nprompt = hub.pull(\"hwchase17/react\")\n\n# 5. Создаем агента\nagent = create_react_agent(\n    llm=llm,\n    tools=tools,\n    prompt=prompt\n)\n\n# 6. Создаем executor\nagent_executor = AgentExecutor(\n    agent=agent,\n    tools=tools,\n    verbose=True,  # Показывать процесс рассуждения\n    max_iterations=5,  # Максимум итераций\n    handle_parsing_errors=True\n)\n\n# 7. Используем агента\nresult = agent_executor.invoke({\n    \"input\": \"Какая погода в Москве и сколько будет 15 * 23?\"\n})\n\nprint(result[\"output\"])",
+            "explanation": "Базовый ReAct агент с тремя инструментами. Агент сам решает, какие инструменты использовать для ответа на вопрос.",
+            "runnable": true
+          },
+          {
+            "type": "text",
+            "content": "## Как это работает\n\n```\nInput: \"Какая погода в Москве и сколько будет 15 * 23?\"\n\n↓ [Agent starts reasoning]\n\nThought: Мне нужно ответить на два вопроса: погода и вычисление\nAction: Weather\nAction Input: \"Москва\"\n\n↓ [Tool executes]\n\nObservation: Погода в Москве: 15°C, облачно\n\n↓ [Agent continues]\n\nThought: Теперь нужно вычислить 15 * 23\nAction: Calculator\nAction Input: \"15 * 23\"\n\n↓ [Tool executes]\n\nObservation: Результат: 345\n\n↓ [Agent finishes]\n\nThought: У меня есть вся необходимая информация\nFinal Answer: В Москве сейчас 15°C и облачно. 15 * 23 = 345\n```"
+          }
+        ]
+      },
+      {
+        "id": "section-3",
+        "title": "LangGraph: Сложные агентские flow",
+        "order": 3,
+        "blocks": [
+          {
+            "type": "text",
+            "content": "# LangGraph: Графы для агентов\n\n**LangGraph** - библиотека для создания сложных агентских workflow с состоянием.\n\n## Преимущества перед обычными Chains\n\n- ✅ Полный контроль над flow\n- ✅ Циклы и условные переходы\n- ✅ Состояние (state) между шагами\n- ✅ Human-in-the-loop\n- ✅ Мультиагентные системы\n\n## Основные концепции\n\n### 1. State\nОбщее состояние графа\n\n### 2. Nodes\nШаги выполнения (функции)\n\n### 3. Edges\nПереходы между шагами\n\n### 4. Conditional Edges\nУсловные переходы"
+          },
+          {
+            "type": "code",
+            "language": "python",
+            "code": "from langgraph.graph import StateGraph, END\nfrom typing import TypedDict, Annotated\nfrom langchain_openai import ChatOpenAI\nimport operator\n\n# 1. Определяем состояние графа\nclass AgentState(TypedDict):\n    messages: Annotated[list, operator.add]  # Список сообщений\n    current_step: str  # Текущий шаг\n    plan: list[str]  # План выполнения\n    completed_steps: list[str]  # Выполненные шаги\n    final_answer: str  # Финальный ответ\n\n# 2. Инициализируем LLM\nllm = ChatOpenAI(model=\"gpt-4\")\n\n# 3. Определяем функции для узлов графа\n\ndef create_plan(state: AgentState) -> AgentState:\n    \"\"\"Создает план выполнения задачи\"\"\"\n    task = state[\"messages\"][-1].content\n    \n    prompt = f\"\"\"\n    Создай пошаговый план для выполнения следующей задачи:\n    {task}\n    \n    Формат: список шагов, каждый с новой строки\n    \"\"\"\n    \n    response = llm.invoke(prompt)\n    plan = response.content.split('\\n')\n    \n    return {\n        **state,\n        \"plan\": plan,\n        \"current_step\": plan[0] if plan else \"\"\n    }\n\ndef execute_step(state: AgentState) -> AgentState:\n    \"\"\"Выполняет текущий шаг плана\"\"\"\n    current_step = state[\"current_step\"]\n    \n    # Здесь логика выполнения шага\n    # Может включать вызов tools, API и т.д.\n    \n    prompt = f\"Выполни следующий шаг: {current_step}\"\n    response = llm.invoke(prompt)\n    \n    completed = state.get(\"completed_steps\", []) + [current_step]\n    \n    # Определяем следующий шаг\n    remaining_steps = [s for s in state[\"plan\"] if s not in completed]\n    next_step = remaining_steps[0] if remaining_steps else \"\"\n    \n    return {\n        **state,\n        \"completed_steps\": completed,\n        \"current_step\": next_step,\n        \"messages\": state[\"messages\"] + [response]\n    }\n\ndef synthesize_answer(state: AgentState) -> AgentState:\n    \"\"\"Синтезирует финальный ответ\"\"\"\n    prompt = f\"\"\"\n    На основе выполненных шагов, сформулируй финальный ответ:\n    \n    Шаги:\n    {chr(10).join(state[\"completed_steps\"])}\n    \n    Результаты:\n    {chr(10).join([m.content for m in state[\"messages\"] if hasattr(m, 'content')])}\n    \"\"\"\n    \n    response = llm.invoke(prompt)\n    \n    return {\n        **state,\n        \"final_answer\": response.content\n    }\n\ndef should_continue(state: AgentState) -> str:\n    \"\"\"Определяет, продолжать ли выполнение\"\"\"\n    if not state[\"current_step\"]:\n        return \"synthesize\"\n    return \"execute\"\n\n# 4. Создаем граф\nworkflow = StateGraph(AgentState)\n\n# Добавляем узлы\nworkflow.add_node(\"plan\", create_plan)\nworkflow.add_node(\"execute\", execute_step)\nworkflow.add_node(\"synthesize\", synthesize_answer)\n\n# Определяем переходы\nworkflow.set_entry_point(\"plan\")\nworkflow.add_edge(\"plan\", \"execute\")\n\n# Условный переход\nworkflow.add_conditional_edges(\n    \"execute\",\n    should_continue,\n    {\n        \"execute\": \"execute\",  # Продолжаем выполнение\n        \"synthesize\": \"synthesize\"  # Переходим к синтезу ответа\n    }\n)\n\nworkflow.add_edge(\"synthesize\", END)\n\n# 5. Компилируем граф\napp = workflow.compile()\n\n# 6. Используем\ninputs = {\n    \"messages\": [{\"role\": \"user\", \"content\": \"Исследуй рынок AI агентов и создай отчет\"}]\n}\n\nfor output in app.stream(inputs):\n    for key, value in output.items():\n        print(f\"--- {key} ---\")\n        print(value)\n        print(\"\\n\")",
+            "explanation": "Продвинутый агент на LangGraph с планированием, пошаговым выполнением и синтезом ответа. Граф имеет циклы и условные переходы.",
+            "runnable": true
+          }
+        ]
+      },
+      {
+        "id": "section-4",
+        "title": "Создание кастомных Tools",
+        "order": 4,
+        "blocks": [
+          {
+            "type": "text",
+            "content": "# Создание собственных инструментов\n\nTools - это функции, которые агент может вызывать для взаимодействия с внешним миром."
+          },
+          {
+            "type": "code",
+            "language": "python",
+            "code": "from langchain.tools import BaseTool, StructuredTool, tool\nfrom langchain.pydantic_v1 import BaseModel, Field\nfrom typing import Optional, Type\n\n# Способ 1: Декоратор @tool (самый простой)\n@tool\ndef search_documentation(query: str) -> str:\n    \"\"\"Поиск в документации. Используй когда нужно найти информацию в docs.\"\"\"\n    # Реальная реализация поиска\n    results = vector_db.search(query, top_k=3)\n    return \"\\n\".join(results)\n\n# Способ 2: StructuredTool (с валидацией параметров)\nclass SearchInput(BaseModel):\n    query: str = Field(description=\"Поисковый запрос\")\n    max_results: int = Field(default=5, description=\"Максимум результатов\")\n    filter_category: Optional[str] = Field(default=None, description=\"Категория для фильтрации\")\n\nsearch_tool = StructuredTool.from_function(\n    func=search_documentation,\n    name=\"DocumentationSearch\",\n    description=\"Поиск информации в документации с фильтрами\",\n    args_schema=SearchInput\n)\n\n# Способ 3: Наследование от BaseTool (максимальный контроль)\nclass CodeAnalyzerTool(BaseTool):\n    name = \"CodeAnalyzer\"\n    description = \"Анализирует код и находит потенциальные проблемы\"\n    \n    def _run(self, code: str, language: str = \"python\") -> str:\n        \"\"\"Синхронное выполнение\"\"\"\n        # Анализ кода\n        issues = self.analyze_code(code, language)\n        return self.format_results(issues)\n    \n    async def _arun(self, code: str, language: str = \"python\") -> str:\n        \"\"\"Асинхронное выполнение\"\"\"\n        issues = await self.analyze_code_async(code, language)\n        return self.format_results(issues)\n    \n    def analyze_code(self, code: str, language: str) -> list:\n        # Статический анализ кода\n        # Используем pylint, eslint и т.д.\n        return []\n    \n    def format_results(self, issues: list) -> str:\n        if not issues:\n            return \"Проблем не найдено!\"\n        return \"\\n\".join(f\"- {issue}\" for issue in issues)\n\n# Способ 4: Tool с состоянием\nclass DatabaseTool(BaseTool):\n    name = \"Database\"\n    description = \"Выполнение SQL запросов к базе данных\"\n    \n    # Состояние\n    connection = None\n    query_history = []\n    \n    def __init__(self, connection_string: str):\n        super().__init__()\n        self.connection = create_connection(connection_string)\n    \n    def _run(self, query: str) -> str:\n        # Валидация SQL injection\n        if not self.is_safe_query(query):\n            return \"Небезопасный запрос!\"\n        \n        # Выполнение\n        results = self.connection.execute(query)\n        \n        # Сохранение в историю\n        self.query_history.append({\n            'query': query,\n            'timestamp': datetime.now(),\n            'rows': len(results)\n        })\n        \n        return self.format_results(results)\n    \n    def is_safe_query(self, query: str) -> bool:\n        # Проверка на SQL injection\n        dangerous_keywords = ['DROP', 'DELETE', 'TRUNCATE', 'ALTER']\n        return not any(kw in query.upper() for kw in dangerous_keywords)\n\n# Использование кастомных tools\ntools = [\n    search_documentation,\n    search_tool,\n    CodeAnalyzerTool(),\n    DatabaseTool(\"postgresql://localhost/mydb\")\n]\n\nagent = create_react_agent(llm, tools, prompt)\nagent_executor = AgentExecutor(agent=agent, tools=tools)",
+            "explanation": "Четыре способа создания кастомных инструментов: от простого декоратора до полноценного класса с состоянием и валидацией",
+            "runnable": false
+          }
+        ]
+      }
+    ],
+    "exercises": [
+      {
+        "id": "exercise-langchain-1",
+        "title": "Создай Research Agent",
+        "description": "Создай агента, который может исследовать тему, используя несколько источников",
+        "type": "build_agent",
+        "difficulty": "medium",
+        "instructions": "Создай агента с инструментами для:\n1. Поиска в интернете\n2. Чтения документации\n3. Анализа данных\n4. Создания структурированного отчета",
+        "starterCode": "from langchain_openai import ChatOpenAI\nfrom langchain.agents import AgentExecutor, create_react_agent\nfrom langchain.tools import Tool\n\n# TODO: Реализуй инструменты\n# TODO: Создай агента\n# TODO: Протестируй на задаче",
+        "hints": [
+          "Начни с определения tools",
+          "Используй ReAct паттерн",
+          "Добавь memory для хранения промежуточных результатов"
+        ]
+      }
+    ],
+    "quiz": {
+      "id": "quiz-langchain-01",
+      "title": "LangChain Development",
+      "passingScore": 75,
+      "questions": [
+        {
+          "id": "q1",
+          "question": "Какой паттерн сочетает рассуждение и действие в LangChain?",
+          "type": "multiple_choice",
+          "options": [
+            "Chain-of-Thought",
+            "ReAct",
+            "Plan-and-Execute",
+            "RAG"
+          ],
+          "correctAnswer": "ReAct",
+          "explanation": "ReAct (Reasoning + Acting) - это паттерн, где агент итеративно рассуждает и выполняет действия.",
+          "points": 10
+        }
+      ]
+    }
+  },
+  "completionCount": 0,
+  "averageRating": 0,
+  "averageCompletionTime": 0,
+  "createdAt": "2025-01-15T00:00:00Z",
+  "updatedAt": "2025-01-15T00:00:00Z"
+}
